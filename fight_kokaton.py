@@ -5,9 +5,12 @@ import time
 import pygame as pg
 
 
-WIDTH = 1600  # ゲームウィンドウの幅
-HEIGHT = 900  # ゲームウィンドウの高さ
+#WIDTH = 1600  # ゲームウィンドウの幅
+#HEIGHT = 900  # ゲームウィンドウの高さ
+WIDTH = 1200
+HEIGHT = 600
 NUM_OF_BOMBS = 5  # 爆弾の数
+multibeam = [] # 複数のビームを格納するリスト
 
 
 def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
@@ -149,7 +152,9 @@ def main():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                beam = Beam(bird)  # ビームクラスのインスタンスを生成する
+                multibeam.append(Beam(bird))  # ビームクラスのインスタンスを生成する
+
+
                 
         screen.blit(bg_img, [0, 0])
         
@@ -158,24 +163,33 @@ def main():
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
                 pg.display.update()
+                print(multibeam) # ビームのリストが削除できているか確認
                 time.sleep(1)
                 return
         
         for i, bomb in enumerate(bombs):
-            if beam is not None:
-                if bomb.rct.colliderect(beam.rct):
-                    bombs[i] = None
-                    beam = None
-                    bird.change_img(6, screen)
-                    pg.display.update()              
+            for j, beam in enumerate(multibeam):
+                if multibeam[j] is not None:
+                    if bomb.rct.colliderect(multibeam[j].rct):
+                        bombs[i] = None
+                        multibeam[j] = None
+                        bird.change_img(6, screen)
+                        pg.display.update()
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         bombs = [bomb for bomb in bombs if bomb is not None]
         for bomb in bombs:
             bomb.update(screen)
-        if beam is not None:
-            beam.update(screen)
+        for i in range(len(multibeam)):
+            # ビームの更新
+            if multibeam[i] is not None:
+                multibeam[i].update(screen)
+                if multibeam[i].rct[0] > WIDTH:
+                    #画面外のビームの要素をリストから削除する
+                    del multibeam[i]
+
+                 
         pg.display.update()
         tmr += 1
         clock.tick(50)
