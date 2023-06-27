@@ -5,10 +5,8 @@ import time
 import pygame as pg
 
 
-#WIDTH = 1600  # ゲームウィンドウの幅
-#HEIGHT = 900  # ゲームウィンドウの高さ
-WIDTH = 1200
-HEIGHT = 600
+WIDTH = 1600  # ゲームウィンドウの幅
+HEIGHT = 900  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 5  # 爆弾の数
 multibeam = [] # 複数のビームを格納するリスト
 
@@ -189,10 +187,11 @@ def main():
             # ビームの更新
             if multibeam[i] is not None:
                 multibeam[i].update(screen)
-                if multibeam[i].rct[0] > WIDTH:
-                    #画面外のビームの要素をリストから削除する
-                    del multibeam[i]
-
+                
+        for i in range(len(multibeam)):
+            if multibeam[i].rct[0] > WIDTH:
+             #画面外のビームの要素をリストから削除する
+                del multibeam[i]
                  
         pg.display.update()
         tmr += 1
